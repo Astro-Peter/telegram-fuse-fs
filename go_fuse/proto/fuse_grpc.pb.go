@@ -27,6 +27,8 @@ type TelegramBotClient interface {
 	GetFileUrl(ctx context.Context, in *FileName, opts ...grpc.CallOption) (*FileUrl, error)
 	UploadFile(ctx context.Context, opts ...grpc.CallOption) (TelegramBot_UploadFileClient, error)
 	GiveFileName(ctx context.Context, in *FileMetaData, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreateDirectory(ctx context.Context, in *DirLocation, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteObject(ctx context.Context, in *DirLocation, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type telegramBotClient struct {
@@ -98,6 +100,24 @@ func (c *telegramBotClient) GiveFileName(ctx context.Context, in *FileMetaData, 
 	return out, nil
 }
 
+func (c *telegramBotClient) CreateDirectory(ctx context.Context, in *DirLocation, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/fuse_tg.telegram_bot/CreateDirectory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *telegramBotClient) DeleteObject(ctx context.Context, in *DirLocation, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/fuse_tg.telegram_bot/DeleteObject", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TelegramBotServer is the server API for TelegramBot service.
 // All implementations must embed UnimplementedTelegramBotServer
 // for forward compatibility
@@ -106,6 +126,8 @@ type TelegramBotServer interface {
 	GetFileUrl(context.Context, *FileName) (*FileUrl, error)
 	UploadFile(TelegramBot_UploadFileServer) error
 	GiveFileName(context.Context, *FileMetaData) (*emptypb.Empty, error)
+	CreateDirectory(context.Context, *DirLocation) (*emptypb.Empty, error)
+	DeleteObject(context.Context, *DirLocation) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTelegramBotServer()
 }
 
@@ -124,6 +146,12 @@ func (UnimplementedTelegramBotServer) UploadFile(TelegramBot_UploadFileServer) e
 }
 func (UnimplementedTelegramBotServer) GiveFileName(context.Context, *FileMetaData) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GiveFileName not implemented")
+}
+func (UnimplementedTelegramBotServer) CreateDirectory(context.Context, *DirLocation) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDirectory not implemented")
+}
+func (UnimplementedTelegramBotServer) DeleteObject(context.Context, *DirLocation) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteObject not implemented")
 }
 func (UnimplementedTelegramBotServer) mustEmbedUnimplementedTelegramBotServer() {}
 
@@ -218,6 +246,42 @@ func _TelegramBot_GiveFileName_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TelegramBot_CreateDirectory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirLocation)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TelegramBotServer).CreateDirectory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/fuse_tg.telegram_bot/CreateDirectory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TelegramBotServer).CreateDirectory(ctx, req.(*DirLocation))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TelegramBot_DeleteObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DirLocation)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TelegramBotServer).DeleteObject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/fuse_tg.telegram_bot/DeleteObject",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TelegramBotServer).DeleteObject(ctx, req.(*DirLocation))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TelegramBot_ServiceDesc is the grpc.ServiceDesc for TelegramBot service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -236,6 +300,14 @@ var TelegramBot_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GiveFileName",
 			Handler:    _TelegramBot_GiveFileName_Handler,
+		},
+		{
+			MethodName: "CreateDirectory",
+			Handler:    _TelegramBot_CreateDirectory_Handler,
+		},
+		{
+			MethodName: "DeleteObject",
+			Handler:    _TelegramBot_DeleteObject_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
