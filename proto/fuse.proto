@@ -5,39 +5,61 @@ package fuse_tg;
 import "google/protobuf/empty.proto";
 
 service telegram_bot{
-  rpc GetObjectsInDir(DirLocation) returns (DirObjects) {}
-  rpc GetFileUrl(FileName) returns (FileUrl) {}
-  rpc UploadFile(stream FileData) returns (FileId) {}
-  rpc GiveFileName(FileMetaData) returns (google.protobuf.Empty) {}
+  rpc GetObjectsInDir(DirLocation) returns (DirObjects) {
+    // Метод возвращающий объекты, которые есть в переданном каталоге
+  }
+  rpc GetFileUrl(FileName) returns (FileUrl) {
+    // Возвращает url телеграмма по которому можно загрузить файл вида
+    // https://api.telegram.org/file/bot<token>/<file_path>,
+    // получив полное имя файла
+  }
+  rpc UploadFile(stream FileData) returns (FileId){
+    // Загружает файл на сервер, получая в ответ число соответсвующее
+    // автоматически сгенерированному имени файла, нужное чтобы добавить
+    // потом имя файла отдельным запросом
+  }
+  rpc GiveFileName(FileMetaData) returns (google.protobuf.Empty) {
+    // Добавляет полное имя к загруженному файлу. После этого сообщения сервер
+    // должен сохранить файл в канале
+  }
 }
 
 message DirLocation {
+  // Полное имя директории, информацию о которой необходимо вернуть
   string location = 1;
 }
 
 message DirObjects {
+  // Имена каталогов, находящихся в нужной директории
   repeated string dirNames = 1;
+  // Имена файлов, находящихся в нужной директории
   repeated string fileNames = 2;
 }
 
 message FileName {
+  // Полное имя файла
   string filename = 1;
 }
 
 message FileUrl {
+  // Url вида https://api.telegram.org/file/bot<token>/<file_path>
   string fileurl = 1;
 }
 
 message FileData {
+  // часть файла в бинарном виде
   bytes data = 1;
 }
 
 message FileId {
+  // Id файла, сгенерированный сервером
   int32 id = 1;
 }
 
 message FileMetaData {
+  // Id файла, сгенерированный сервером
   int32 id = 1;
+  // Полное имя файла
   string filename = 2;
 }
 
