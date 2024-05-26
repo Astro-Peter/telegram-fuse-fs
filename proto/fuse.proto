@@ -25,6 +25,9 @@ service telegram_bot{
   rpc CreateDirectory(DirLocation) returns (google.protobuf.Empty) {
     // Создает новою директорию по переданному полному пути
   }
+  rpc DeleteObject(DirLocation) returns (google.protobuf.Empty) {
+    // Удаляет объект с переданным абсолютным именем
+  }
 }
 
 message DirLocation {
