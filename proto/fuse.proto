@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package fuse_tg;
+
+import "google/protobuf/empty.proto";
+
+service telegram_bot{
+  rpc GetObjectsInDir(DirLocation) returns (DirObjects) {}
+  rpc GetFileUrl(FileName) returns (FileUrl) {}
+  rpc UploadFile(stream FileData) returns (FileId) {}
+  rpc GiveFileName(FileMetaData) returns (google.protobuf.Empty) {}
+}
+
+message DirLocation {
+  string location = 1;
+}
+
+message DirObjects {
+  repeated string dirNames = 1;
+  repeated string fileNames = 2;
+}
+
+message FileName {
+  string filename = 1;
+}
+
+message FileUrl {
+  string fileurl = 1;
+}
+
+message FileData {
+  bytes data = 1;
+}
+
+message FileId {
+  int32 id = 1;
+}
+
+message FileMetaData {
+  int32 id = 1;
+  string filename = 2;
+}
+
+option go_package = "./proto;go_fuse";
