@@ -3,6 +3,7 @@ syntax = "proto3";
 package fuse_tg;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service telegram_bot{
   rpc GetObjectsInDir(DirLocation) returns (DirObjects) {
@@ -36,10 +37,24 @@ message DirLocation {
 }
 
 message DirObjects {
-  // Имена каталогов, находящихся в нужной директории
-  repeated string dirNames = 1;
-  // Имена файлов, находящихся в нужной директории
-  repeated string fileNames = 2;
+  // Информация о каталогах, находящихся в нужной директории
+  repeated Directory dirNames = 1;
+  // Информация о файлах, находящихся в нужной директории
+  repeated File fileNames = 2;
+}
+
+message Directory {
+  // Имя директории
+  string dirName = 1;
+  // Время создания директории
+  google.protobuf.Timestamp ctime = 2;
+}
+
+message File {
+  // Имя файла
+  string fileName = 1;
+  // Время отправки файла
+  google.protobuf.Timestamp ctime = 2;
 }
 
 message FileName {
